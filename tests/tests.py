@@ -1,14 +1,15 @@
 import pytest
-import time
 
 from src.uploader import run_uploader
+from src.api_callers.api_yandex_cloud import YandexCloudClient
+from src.api_callers.api_dog import DogClient
 
 from tests.utils import extract_subbreed_from_filename, parse_file_item, check_operations_completion
 from tests.enums import Filetype
 
 
 @pytest.mark.parametrize('breed', ['doberman', 'affenpinscher'])
-def test_upload_dog_breed_without_subs(ya_client, folder_name, breed):
+def test_upload_dog_breed_without_subs(ya_client: YandexCloudClient, folder_name: str, breed: str):
     uploader = run_uploader(folder_name, breed, ya_client._token)
 
     check_operations_completion(
@@ -33,7 +34,7 @@ def test_upload_dog_breed_without_subs(ya_client, folder_name, breed):
 
 
 @pytest.mark.parametrize('breed', ['bulldog', 'collie'])
-def test_upload_dog_breed_with_subs(ya_client, dog_client, folder_name, breed):
+def test_upload_dog_breed_with_subs(ya_client: YandexCloudClient, dog_client: DogClient, folder_name: str, breed: str):
     uploader = run_uploader(folder_name, breed, ya_client._token)
 
     check_operations_completion(

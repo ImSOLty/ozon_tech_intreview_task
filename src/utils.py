@@ -1,7 +1,7 @@
 from src.exceptions import InvalidBreedUrlException
 
 
-def extract_filename_from_url(url):
+def extract_filename_from_url(url: str):
     part_name = url.split('/')
     if len(part_name) < 2:
         raise InvalidBreedUrlException

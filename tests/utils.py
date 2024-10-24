@@ -1,5 +1,6 @@
 import os
 import time
+from typing import Callable, Any
 
 from src.api_callers.api_yandex_cloud import YandexCloudClient
 from src.api_callers.api_dog import DogClient
@@ -20,7 +21,7 @@ def acquire_dog_client():
     return DogClient()
 
 
-def check_operations_completion(condition, max_retries=15, timeout=1):
+def check_operations_completion(condition: Callable, max_retries: float = 15, timeout: float = 1):
     num_of_retries = 0
     while num_of_retries < max_retries:
         num_of_retries += 1
@@ -30,7 +31,7 @@ def check_operations_completion(condition, max_retries=15, timeout=1):
     raise AssertionError(f"Timeout. YD operations didn't complete in {max_retries} retries")
 
 
-def parse_file_item(item):
+def parse_file_item(item: dict[str, Any]):
     for field in ['type', 'name']:
         assert field in item, f"There is no '{field}' field in response structure"
     file_type = Filetype(item['type'])
@@ -43,7 +44,7 @@ def parse_file_item(item):
     return file_type, file_name, file_items
 
 
-def extract_subbreed_from_filename(filename):
+def extract_subbreed_from_filename(filename: str):
     # according to dog.ceo format is <breed>-<subbreed>
     # where all characters are alphabetic in both of them
     return filename[filename.find('-') + 1:filename.find('_')]
