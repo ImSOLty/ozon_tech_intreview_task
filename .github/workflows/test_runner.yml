@@ -1,0 +1,29 @@
+name: TestRunner
+
+on:
+  push:
+
+jobs:
+  lint_python:
+    name: Python Test Runner Job
+    runs-on: ubuntu-20.04
+    env:
+      YA_API_TOKEN: ${{ secrets.YA_API_TOKEN }} # is hidden under secrets
+    continue-on-error: true
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests
+        working-directory: './tests'
+        run: |
+          pytest tests.py
