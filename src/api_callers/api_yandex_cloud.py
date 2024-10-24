@@ -35,7 +35,6 @@ class YandexCloudClient(BaseClient):
         target_url = f'{self._url}/{RESOURCES_ROUTE}'
         return self.get(target_url, headers=self._request_headers, params=params)
 
-    @append_operation
     def create_new_folder_on_yd(self, path: str):
         params = {'path': path}
         target_url = f'{self._url}/{RESOURCES_ROUTE}'
@@ -58,10 +57,11 @@ class YandexCloudClient(BaseClient):
 
     def check_completed_operations(self):
         for operation in list(self.awaited_operations):
+            print(operation)
             try:
                 status = self.get(operation, headers=self._request_headers).json()['status']
                 if status != 'in-progress':
                     self.awaited_operations.remove(operation)
             except KeyError:
                 self.awaited_operations.remove(operation)
-        return not self.awaited_operations
+        return len(self.awaited_operations) == 0

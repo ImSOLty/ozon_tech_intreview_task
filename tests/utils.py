@@ -21,7 +21,7 @@ def acquire_dog_client():
     return DogClient()
 
 
-def check_operations_completion(condition: Callable, max_retries: float = 15, timeout: float = 1):
+def check_operations_completion(condition: Callable, max_retries: float = 30, timeout: float = 1):
     num_of_retries = 0
     while num_of_retries < max_retries:
         num_of_retries += 1
