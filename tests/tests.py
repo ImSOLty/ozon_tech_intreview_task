@@ -1,47 +1,64 @@
 import pytest
-import random
-import requests
-import os
-from dotenv import load_dotenv
+import time
 
-from src.dogs import get_sub_breeds, u
+from src.uploader import run_uploader
 
-TOKEN_ENV = "YA_API_TOKEN"
+from tests.utils import extract_subbreed_from_filename, parse_file_item, check_operations_completion
+from tests.enums import Filetype
 
 
-@pytest.fixture(scope="session", autouse=True)
-def load_env():
-    load_dotenv()
+@pytest.mark.parametrize('breed', ['doberman', 'affenpinscher'])
+def test_upload_dog_breed_without_subs(ya_client, folder_name, breed):
+    uploader = run_uploader(folder_name, breed, ya_client._token)
+
+    check_operations_completion(
+        condition=uploader.ya_client.check_completed_operations
+    )
+
+    response = ya_client.get_folder_content(folder_name)
+    assert response.ok, f"Couldn't successfully GET contents of {folder_name}: {response.status_code}"
+    file_type, file_name, embedded_items = parse_file_item(response.json())
+    assert file_type == Filetype.DIR, \
+        f"Expected '{Filetype.DIR}' filetype, found '{file_type}'"
+    assert file_name == folder_name, \
+        f"Expected '{folder_name}' filename, found '{file_name}'"
+
+    assert len(embedded_items) == 1  # single picture in folder
+    for item in embedded_items:
+        file_type, file_name, _ = parse_file_item(item)
+        assert file_type == Filetype.FILE, \
+            f"Expected '{Filetype.FILE}' filetype, found '{file_type}'"
+        assert file_name.startswith(breed), \
+            f"File name '{file_name}' should start with '{breed}' breed"
 
 
-def ya_api_token():
-    return os.getenv(TOKEN_ENV)
+@pytest.mark.parametrize('breed', ['bulldog', 'collie'])
+def test_upload_dog_breed_with_subs(ya_client, dog_client, folder_name, breed):
+    uploader = run_uploader(folder_name, breed, ya_client._token)
 
+    check_operations_completion(
+        condition=uploader.ya_client.check_completed_operations
+    )
 
-@pytest.mark.parametrize('breed', ['doberman', random.choice(['bulldog', 'collie'])])
-def test_proverka_upload_dog(breed):
-    token = ya_api_token()
-    u(breed, token)
-    # проверка
-    url_create = 'https://cloud-api.yandex.net/v1/disk/resources'
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': f'OAuth {token}'}
-    target_url = f'{url_create}?path=/test_folder'
-    response = requests.get(target_url, headers=headers)
-    assert response.ok, f"Couldn't successfully GET target url ({target_url})"
-    assert response.json()['type'] == "dir"
-    assert response.json()['name'] == "test_folder"
-    assert True
-    if get_sub_breeds(breed) == []:
-        assert len(response.json()['_embedded']['items']) == 1
-        for item in response.json()['_embedded']['items']:
-            assert item['type'] == 'file'
-            assert item['name'].startswith(breed)
+    response = ya_client.get_folder_content(folder_name)
+    assert response.ok, f"Couldn't successfully GET contents of {folder_name}: {response.status_code}"
+    file_type, file_name, embedded_items = parse_file_item(response.json())
+    assert file_type == Filetype.DIR, \
+        f"Expected '{Filetype.DIR}' filetype, found '{file_type}'"
+    assert file_name == folder_name, \
+        f"Expected '{folder_name}' filename, found '{file_name}'"
 
-    else:
-        assert len(response.json()['_embedded']['items']) == len(get_sub_breeds(breed))
-        for item in response.json()['_embedded']['items']:
-            assert item['type'] == 'file'
-            assert item['name'].startswith(breed)
+    sub_breeds_list = set(dog_client.get_sub_breeds_list(breed))
+    extracted_sub_breeds = set()
+
+    assert len(embedded_items) == len(sub_breeds_list)
+    for item in embedded_items:
+        file_type, file_name, _ = parse_file_item(item)
+        assert file_type == Filetype.FILE, \
+            f"Expected '{Filetype.FILE}' filetype, found '{file_type}'"
+        assert file_name.startswith(breed), \
+            f"File name '{file_name}' should start with '{breed}' breed"
+        extracted_sub_breeds.add(extract_subbreed_from_filename(file_name))
+
+    assert sub_breeds_list == extracted_sub_breeds, \
+        f"There is difference between sets of sub breeds: expected {sub_breeds_list}, got {extracted_sub_breeds}"
