@@ -1,15 +1,17 @@
 from api_callers.api_base import BaseClient
+from api_callers.const_api_urls import DOG_API_URL
+
 from exceptions import BreedNotFoundException
 
 BREED_ROUTE = 'breed'
 SUB_BREEDS_ROUTE = f'{BREED_ROUTE}/{{breed}}'
-RANDOM_IMAGE_ROUTE = f'{BREED_ROUTE}/{{breed}}/images/random'
-LIST_ROUTE = f'{BREED_ROUTE}/{{breed}}/list'
+RANDOM_IMAGE_ROUTE = f'{SUB_BREEDS_ROUTE}/images/random'
+LIST_ROUTE = f'{SUB_BREEDS_ROUTE}/list'
 
 
 class DogClient(BaseClient):
-    def __init__(self, url):
-        super().__init__(url)
+    def __init__(self):
+        super().__init__(DOG_API_URL)
 
     def get_sub_breeds_list(self, breed):
         target_url = f'{self._url}/{LIST_ROUTE}'.format(breed=breed)

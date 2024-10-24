@@ -1,4 +1,5 @@
 from api_callers.api_base import BaseClient
+from api_callers.const_api_urls import YA_API_URL
 
 from exceptions import AuthException
 
@@ -7,8 +8,8 @@ RESOURCES_URLOAD_ROUTE = f'{RESOURCES_ROUTE}/upload'
 
 
 class YandexCloudClient(BaseClient):
-    def __init__(self, url, token):
-        super().__init__(url)
+    def __init__(self, token):
+        super().__init__(YA_API_URL)
         if token is None:
             raise AuthException(f"{self.__class__.__name__}: No token provided")
         self._request_headers = {
@@ -16,7 +17,6 @@ class YandexCloudClient(BaseClient):
             'Accept': 'application/json',
             'Authorization': f'OAuth {token}'
         }
-        print(self._request_headers)
 
     def create_new_folder_on_yd(self, path):
         params = {'path': path}
@@ -32,7 +32,7 @@ class YandexCloudClient(BaseClient):
         for name, url in name_url_dict.items():
             self.upload_photos_to_yd(path, url, name)
 
-    def clear_folder(self, path, permanently):
+    def remove_folder(self, path, permanently):
         params = {'path': path, 'permanently': permanently}
         target_url = f'{self._url}/{RESOURCES_ROUTE}'
         self.delete(target_url, headers=self._request_headers, params=params)
