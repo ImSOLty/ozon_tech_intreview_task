@@ -8,13 +8,13 @@ class YaUploader:
     def create_folder(self, path, token):
         url_create = 'https://cloud-api.yandex.net/v1/disk/resources'
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'OAuth {token}'}
-        response = requests.put(f'{url_create}?path={path}', headers=headers)
+        requests.put(f'{url_create}?path={path}', headers=headers)
 
     def upload_photos_to_yd(self, token, path, url_file, name):
         url = "https://cloud-api.yandex.net/v1/disk/resources/upload"
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'OAuth {token}'}
         params = {"path": f'/{path}/{name}', 'url': url_file, "overwrite": "true"}
-        resp = requests.post(url, headers=headers, params=params)
+        requests.post(url, headers=headers, params=params)
 
 
 def get_sub_breeds(breed):

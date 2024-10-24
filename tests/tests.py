@@ -13,7 +13,7 @@ def test_proverka_upload_dog(breed):
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': f'OAuth AgAAAAAJtest_tokenxkUEdew'}
+        'Authorization': 'OAuth AgAAAAAJtest_tokenxkUEdew'}
     response = requests.get(f'{url_create}?path=/test_folder', headers=headers)
     assert response.json()['type'] == "dir"
     assert response.json()['name'] == "test_folder"
