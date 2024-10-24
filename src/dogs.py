@@ -1,5 +1,9 @@
 import requests
 
+from .exceptions import AuthException
+
+NO_TOKEN_MESSAGE = "No token provided"
+
 
 class YaUploader:
     def __init__(self):
@@ -34,12 +38,14 @@ def get_urls(breed, sub_breeds):
     return url_images
 
 
-def u(breed):
+def u(breed, token):
     sub_breeds = get_sub_breeds(breed)
     urls = get_urls(breed, sub_breeds)
     yandex_client = YaUploader()
-    yandex_client.create_folder('test_folder', "AgAAAAAJtest_tokenxkUEdew")
+    if token is None:
+        raise AuthException(NO_TOKEN_MESSAGE)
+    yandex_client.create_folder('test_folder', token)
     for url in urls:
         part_name = url.split('/')
         name = '_'.join([part_name[-2], part_name[-1]])
-        yandex_client.upload_photos_to_yd("AgAAAAAJtest_tokenxkUEdew", "test_folder", url, name)
+        yandex_client.upload_photos_to_yd(token, "test_folder", url, name)

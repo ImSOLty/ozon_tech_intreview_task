@@ -7,6 +7,8 @@ jobs:
   lint_python:
     name: Python Linter Job
     runs-on: ubuntu-20.04
+    env:
+      YA_API_TOKEN: "AgAAAAAJtest_tokenxkUEdew" # should be hidden under secrets
     continue-on-error: true
     strategy:
       matrix:
