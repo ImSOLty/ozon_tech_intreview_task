@@ -1,0 +1,39 @@
+from api_callers.api_yandex_cloud import YandexCloudClient
+from api_callers.api_dog import DogClient
+from exceptions import InvalidBreedUrlException
+from utils import extract_filename_from_url
+
+from consts import YA_API_URL, DOG_API_URL
+
+from argparse import ArgumentParser
+
+
+class Uploader():
+    def __init__(self, ya_token):
+        self.ya_client = YandexCloudClient(YA_API_URL, token=ya_token)
+        self.dog_client = DogClient(DOG_API_URL)
+
+    # main action
+    def upload_breed(self, folder_path, breed):
+        self.ya_client.create_new_folder_on_yd(folder_path)
+        breed_urls = self.dog_client.get_images_of_breed(breed)
+        name_url_dict = {}
+        for breed_url in breed_urls:
+            name = extract_filename_from_url(breed_url)
+            if name is None:
+                raise InvalidBreedUrlException()
+            name_url_dict[name] = breed_url
+        self.ya_client.batch_upload_photos_to_yd(folder_path, name_url_dict)
+
+
+def run_uploader(folder_path, breed, token):
+    uploader = Uploader(token)
+    uploader.upload_breed(folder_path, breed)
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    for arg in ['folder_path', 'breed', 'token']:
+        parser.add_argument(arg)
+    args = parser.parse_args()
+    run_uploader(args.folder_path, args.breed, args.token)
