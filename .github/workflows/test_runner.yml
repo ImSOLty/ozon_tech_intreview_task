@@ -8,7 +8,7 @@ jobs:
     name: Python Test Runner Job
     runs-on: ubuntu-20.04
     env:
-      YA_API_TOKEN: {{ secrets.YA_API_TOKEN }} # is hidden under secrets
+      YA_API_TOKEN: ${{ secrets.YA_API_TOKEN }} # is hidden under secrets
     continue-on-error: true
     steps:
       - name: Get repository code
