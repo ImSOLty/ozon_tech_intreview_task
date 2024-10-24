@@ -1,7 +1,7 @@
-from api_callers.api_base import BaseClient
-from api_callers.const_api_urls import DOG_API_URL
+from src.api_callers.api_base import BaseClient
+from src.api_callers.const_api_urls import DOG_API_URL
 
-from exceptions import BreedNotFoundException
+from src.exceptions import BreedNotFoundException
 
 BREED_ROUTE = 'breed'
 SUB_BREEDS_ROUTE = f'{BREED_ROUTE}/{{breed}}'

@@ -1,4 +1,4 @@
-from exceptions import InvalidBreedUrlException
+from src.exceptions import InvalidBreedUrlException
 
 
 def extract_filename_from_url(url):

@@ -1,8 +1,8 @@
-from api_callers.api_yandex_cloud import YandexCloudClient
-from api_callers.api_dog import DogClient
-from utils import extract_filename_from_url
-
 from argparse import ArgumentParser
+
+from src.api_callers.api_yandex_cloud import YandexCloudClient
+from src.api_callers.api_dog import DogClient
+from src.utils import extract_filename_from_url
 
 
 class Uploader():
@@ -24,6 +24,7 @@ class Uploader():
 def run_uploader(folder_path, breed, token):
     uploader = Uploader(token)
     uploader.upload_breed(folder_path, breed)
+    return uploader
 
 
 if __name__ == '__main__':
